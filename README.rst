@@ -1,5 +1,5 @@
-mpiprof: profiler for MPI python programs
-=========================================
+mpiprof.py: Profiler for MPI python programs
+============================================
 
 Overview
 --------
@@ -22,7 +22,7 @@ Installation
     - ``pip install .``
 
 Requirements
------------
+------------
 - Python 3.8+
 - mpi4py
 - An MPI runtime if you plan to launch under mpiexec/srun/etc.
