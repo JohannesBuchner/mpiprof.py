@@ -1,9 +1,16 @@
-import mpi4py.MPI as MPI
 import time
 import traceback
 
 class MPIProfiler:
+    """Call profiler for mpi4py."""
     def __init__(self, comm):
+        """Initialise.
+
+        Parameters
+        ----------
+        comm: object
+            most likely, mpi4py.COMM_WORLD or a similar object
+        """
         self.comm = comm
         self.rank = comm.Get_rank()
         self.statistics = {}  # To store call stack timings
@@ -21,19 +28,21 @@ class MPIProfiler:
             if hasattr(self.comm, method):
                 original_method = getattr(self.comm, method)
                 if callable(original_method):
-                    wrapped_method = self.wrap_mpi_method(original_method, method)
+                    wrapped_method = self._wrap_mpi_method(original_method, method)
                     setattr(self, method, wrapped_method)
         self.last_mpi_time = time.time()  # Last time an MPI call was completed
             
-    def get_call_stack(self):
+    def _get_call_stack(self):
+        """Extract caller information."""
         frame_stack = traceback.extract_stack()
         # Return (filename, lineno) excluding this wrapper class's frames
         return [f'{frame.filename}:{frame.lineno}' for frame in frame_stack[:-2]]
 
-    def wrap_mpi_method(self, mpi_function, func_name):
+    def _wrap_mpi_method(self, mpi_function, func_name):
+        """Make forwarded which records call information."""
         def wrapper(*args, **kwargs):
             since_last_call = time.time() - self.last_mpi_time
-            call_stack = self.get_call_stack()
+            call_stack = self._get_call_stack()
 
             # Call the original MPI function
             start_time = time.time()
@@ -43,12 +52,13 @@ class MPIProfiler:
             duration = end_time - start_time
 
             # Record statistics
-            self.record_statistics(func_name, call_stack, duration, since_last_call)
+            self._record_statistics(func_name, call_stack, duration, since_last_call)
             self.last_mpi_time = time.time()
             return result
         return wrapper
 
-    def record_statistics(self, func_name, call_stack, duration, since_last_call=None):
+    def _record_statistics(self, func_name, call_stack, duration, since_last_call):
+        """Store statistics for this type of call."""
         call_key = (func_name, tuple(call_stack))
         if call_key not in self.statistics:
             self.statistics[call_key] = {'count': 0, 'durations': 0, 'since_last_call': 0}
@@ -57,6 +67,15 @@ class MPIProfiler:
         self.statistics[call_key]['since_last_call'] += since_last_call
 
     def write_statistics(self, prefix='MPIprofile.', suffix='.out'):
+        """Write records to ascii file.
+        
+        Parameters
+        ----------
+        prefix: str
+            Prefix of output file, before rank ID.
+        suffix: str
+            Suffix of output file, after rank ID.
+        """
         start_time = time.time()
         mpi_time_total = 0
         non_mpi_time_total = 0
@@ -81,5 +100,3 @@ class MPIProfiler:
 
         # shift last call time, to subtract time spent in this function
         self.last_mpi_time += end_time - start_time
-
-
