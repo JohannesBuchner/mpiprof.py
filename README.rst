@@ -1,24 +1,30 @@
 mpiprof.py: Profiler for MPI python programs
 ============================================
 
-Overview
---------
+Enables:
+
+1. using cProfile on each launched MPI process.
+2. measuring the communication overhead of your MPI setup.
+
 mpiprof provides two complementary pieces:
 
-- A small runner you can invoke as a module to profile each MPI rank with
-  Python's cProfile, writing a separate .pstats file per rank:
-  ``mpiexec -n 4 python3 -m mpiprof your_script.py arg1 arg2``.
+1. A small runner you can invoke as a module to profile each MPI rank with
+   Python's cProfile, writing a separate .pstats file per rank:
+   ``mpiexec -n 4 python3 -m mpiprof your_script.py arg1 arg2``.
 
-- An optional ``MPIProfiler`` class that wraps a ``mpi4py.MPI.Comm`` and
-  records basic timing/count statistics of common MPI calls, which you
-  can write to disk by calling ``write_statistics()``.
+2. An optional ``MPIProfiler`` class that wraps a ``mpi4py.MPI.Comm`` and
+   records basic timing/count statistics of MPI calls and where they came from.
+   You can write the results to disk by calling ``write_statistics()``.
 
 Installation
 ------------
-- From a local checkout:
 
-  - Optional but recommended to use a virtual environment.
-  - Install:
+- From pypi:
+
+    - ``pip install mpiprof``
+
+- From a local checkout, after cloning this repository:
+
     - ``pip install .``
 
 Requirements
@@ -62,7 +68,7 @@ Example:
 .. code-block:: python
 
     from mpi4py import MPI
-    from mpiprofiler import MPIProfiler
+    from mpiprof import MPIProfiler
 
     comm = MPIProfiler(MPI.COMM_WORLD)
 
