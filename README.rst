@@ -1,5 +1,5 @@
-mpiprof: per-rank Python profiler for MPI and a simple mpi4py communicator profiler
-===================================================================================
+mpiprof: profiler for MPI python programs
+=========================================
 
 Overview
 --------
@@ -98,8 +98,7 @@ Notes:
 
 Rank detection
 --------------
-The runner and the ``MPIProfiler`` both try to detect the rank via common
-environment variables:
+The runner tries to detect the rank via common environment variables:
 
 - ``OMPI_COMM_WORLD_RANK``, ``PMIX_RANK`` (Open MPI)
 - ``PMI_RANK`` (MPICH, Intel MPI)
