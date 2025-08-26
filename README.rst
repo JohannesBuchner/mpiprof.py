@@ -23,7 +23,7 @@ Installation
 
     pip install mpiprof
 
-- From a local checkout, by cloning this repository:
+- From a local checkout, by cloning this repository::
 
     git clone https://github.com/JohannesBuchner/mpiprof.py
     cd mpiprof.py/
