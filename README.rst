@@ -122,8 +122,33 @@ Output files
   - ``python3 -m pstats mpiprof.0.pstats``
   - ``snakeviz mpiprof.0.pstats``
 
-- MPIProfiler: ``mpiprof.stats.<rank>.json`` with operation counts and
-  total wall-clock time per operation.
+- MPIProfiler: ``MPIprofile.<rank>.out`` with operation counts and
+  total wall-clock time per operation. Example::
+
+    Function: scatter
+    Call stack:
+            surveymcmc.py:466
+            surveymcmc.py:431 sampler.advance_one_step(False)
+            mcaeis.py:107 local_coords = self.comm.scatter(chunks, root=0)
+    Number of calls: 2
+    Duration During Call: 98.990435s
+    Duration Before Call: 0.000014s
+
+    Function: scatter
+    Call stack:
+            surveymcmc.py:466
+            surveymcmc.py:448 sampler.advance_one_step()
+            mcaeis.py:75 self._init()
+            mcaeis.py:55 self.log_probs = self._evaluate_log_probs(self.coords)
+            mcaeis.py:64 local_coords = self.comm.scatter(chunks, root=0)
+    Number of calls: 39
+    Duration During Call: 2.228181s
+    Duration Before Call: 0.000025s
+    
+    Total MPI Time: 388.922329s
+    Total Non-MPI Time: 206.503627s
+
+Results are sorted (descending) by duration during call.
 
 Limitations
 -----------
