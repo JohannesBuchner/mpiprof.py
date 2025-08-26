@@ -32,7 +32,10 @@ def main(argv=None):
     # argparse will include leading '--' in args; strip a single leading '--' if present.
     # We parse once, then clean args.
     ns = parser.parse_args(argv)
-    outfile = ns.outfile
+    rank = os.environ.get('OMPI_COMM_WORLD_RANK', os.environ.get('PMIX_RANK',
+        os.environ.get('PMI_RANK', os.environ.get('MV2_COMM_WORLD_RANK',
+        os.environ.get('SLURM_PROCID', "0")))))
+    outfile = ns.outfile.replace('{rank}', rank)
     script = ns.script
     if ns.args and ns.args[0] == "--":
         args = [script] + list(ns.args)[1:]
