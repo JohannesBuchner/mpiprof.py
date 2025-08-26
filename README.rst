@@ -8,9 +8,9 @@ Enables:
 
 mpiprof provides two complementary pieces:
 
-1. A small runner you can invoke as a module to profile each MPI rank with
-   Python's cProfile, writing a separate .pstats file per rank:
+1. A drop-in wrapper for cProfile that you can invoke as a module,
    ``mpiexec -n 4 python3 -m mpiprof your_script.py arg1 arg2``.
+   This writes a separate .pstats file for each rank.
 
 2. An optional ``MPIProfiler`` class that wraps a ``mpi4py.MPI.Comm`` and
    records basic timing/count statistics of MPI calls and where they came from.

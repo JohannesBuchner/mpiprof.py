@@ -1,4 +1,5 @@
 import time
+import os
 import traceback
 
 class MPIProfiler:
@@ -36,7 +37,7 @@ class MPIProfiler:
         """Extract caller information."""
         frame_stack = traceback.extract_stack()
         # Return (filename, lineno) excluding this wrapper class's frames
-        return [f'{frame.filename}:{frame.lineno}' for frame in frame_stack[:-2]]
+        return [(frame.filename, frame.lineno) for frame in frame_stack[:-2]]
 
     def _wrap_mpi_method(self, mpi_function, func_name):
         """Make forwarded which records call information."""
@@ -81,15 +82,23 @@ class MPIProfiler:
         non_mpi_time_total = 0
         # Write stats to file
         with open(f"{prefix}{self.rank}{suffix}", "w") as f:
-            for call_key, data in sorted(self.statistics.items()):
+            for call_key, data in sorted(self.statistics.items(), key=lambda kv: kv[1]['durations'], reverse=True):
                 mpi_time_total += data['durations']
                 non_mpi_time_total += data['since_last_call']
                 func_name, call_stack = call_key
+                call_stack_strs = []
+                for filename, lineno in call_stack:
+                    call_stack_strs.append(f"{filename}:{lineno + 1}")
+                    if not filename.startswith('<') and os.path.exists(filename):
+                        with open(filename) as fin:
+                            lines = fin.readlines()
+                            if len(lines) > lineno:
+                                call_stack_strs[-1] = call_stack_strs[-1] + " " + lines[lineno - 1].strip()
                 durations = data['durations']
                 count = data['count']
                 since_last_calls = data['since_last_call']
                 f.write(f"Function: {func_name}\n")
-                f.write(f"Call stack: \n\t{"\n\t".join(call_stack)}\n")
+                f.write(f"Call stack: \n\t{"\n\t".join(call_stack_strs)}\n")
                 f.write(f"Number of calls: {count}\n")
                 f.write(f"Duration During Call: {durations / count:.6f}s\n")
                 f.write(f"Duration Before Call: {since_last_calls / count:.6f}s\n")

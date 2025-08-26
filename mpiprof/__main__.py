@@ -47,10 +47,6 @@ def main(argv=None):
     dumped = {"done": False}
 
     def dump_and_exit(code=0):
-        if dumped["done"]:
-            # Avoid double-dump from atexit + signal
-            sys.exit(code)
-        dumped["done"] = True
         try:
             pr.disable()
         except Exception:
@@ -62,11 +58,9 @@ def main(argv=None):
                 sys.stderr.write(f"Failed to dump profile to {outfile}: {e}\n")
             except Exception:
                 pass
-        sys.exit(code)
 
     def _sig_handler(signum, frame):
         # 130 for SIGINT, 143 for SIGTERM, like shells do
-        print("got signal:", signum)
         dump_and_exit(130 if signum == signal.SIGINT else 143)
 
     # Dump on normal interpreter shutdown too
