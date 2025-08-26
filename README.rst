@@ -19,13 +19,15 @@ mpiprof provides two complementary pieces:
 Installation
 ------------
 
-- From pypi:
+- From pypi::
 
-    - ``pip install mpiprof``
+    pip install mpiprof
 
-- From a local checkout, after cloning this repository:
+- From a local checkout, by cloning this repository:
 
-    - ``pip install .``
+    git clone https://github.com/JohannesBuchner/mpiprof.py
+    cd mpiprof.py/
+    pip install .
 
 Requirements
 ------------
