@@ -98,7 +98,8 @@ class MPIProfiler:
                 count = data['count']
                 since_last_calls = data['since_last_call']
                 f.write(f"Function: {func_name}\n")
-                f.write(f"Call stack: \n\t{"\n\t".join(call_stack_strs)}\n")
+                prefix = "\n\t"
+                f.write(f"Call stack: {prefix}{prefix.join(call_stack_strs)}\n")
                 f.write(f"Number of calls: {count}\n")
                 f.write(f"Duration During Call: {durations / count:.6f}s\n")
                 f.write(f"Duration Before Call: {since_last_calls / count:.6f}s\n")
